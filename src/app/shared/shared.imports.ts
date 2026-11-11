@@ -1,36 +1,60 @@
-//Módulos para formularios y directivas de Angular que se importan en los componentes standalone de la aplicación.
+// Módulos para formularios y directivas de Angular que se importan en los componentes standalone de la aplicación.
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgOptimizedImage } from '@angular/common';
-
-//Router
+/* =========================
+   Router
+   ========================= */
 import { RouterModule } from '@angular/router';
 
-// Angular material
-import {MatDividerModule} from '@angular/material/divider';
-import {MatButtonModule} from '@angular/material/button';
-import {MatIconModule} from '@angular/material/icon';
+// Elementos de angular Material que se importan en los componentes standalone de la aplicación.
 
+import {MatButtonModule} from '@angular/material/button';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatIconModule} from '@angular/material/icon';
+import {MatCardModule} from '@angular/material/card';
+import {MatRadioModule} from '@angular/material/radio';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatSelectModule} from '@angular/material/select';
+
+/* =========================
+   ngx-mask (inputs de código)
+   ========================= */
+import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 
 /**
  * SHARED_IMPORTS
- * ----------------------------------------------------------
+ * ---------------------------------------------------------
  * Colección de módulos/directivas reutilizables en
  * componentes standalone.
  *
  * Se importa así:
- * imports: [...SHARED_IMPORTS, HeaderApp,  FooterApp]
+ * imports: [...SHARED_IMPORTS, HeaderApp, FooterApp]
  */
-
 export const SHARED_IMPORTS = [
-  /*Angular*/
+  /* Angular */
   CommonModule,
   FormsModule,
   ReactiveFormsModule,
   RouterModule,
   NgOptimizedImage,
-  /*Angular Material*/
-  MatDividerModule,
+  /* Angular Material */
   MatButtonModule,
+  MatDividerModule,
   MatIconModule,
+  MatCardModule,
+  MatRadioModule,
+  MatInputModule,
+  MatFormFieldModule,
+  MatDatepickerModule,
+  MatNativeDateModule,
+  MatCheckboxModule,
+  MatSelectModule,
+  /* ngx-mask */
+  NgxMaskDirective,
+  NgxMaskPipe
 ];
