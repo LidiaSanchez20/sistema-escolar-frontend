@@ -3,6 +3,7 @@ import { SHARED_IMPORTS } from '../../shared/shared.imports';
 import { Location } from '@angular/common';
 import { DatosAlumno } from '../../interfaces/usuarios.interfaces';
 import { AlumnosService } from '../../services/alumnos-service';
+import { NotificationService } from '../../services/tools/notification-service';
 
 @Component({
   selector: 'app-registro-alumnos',
@@ -20,6 +21,8 @@ export class RegistroAlumnos implements OnInit {
   private location = inject(Location);
   //Inyectar el servicio de alumnos para poder registrar y actualizar los datos del administrador
   private alumnosService = inject(AlumnosService);
+  // Inyectar el servicio de notificaciones para mostrar mensajes al usuario
+  private notificationService = inject(NotificationService);
 
   //Declarar las variables para el formulario de registro de alumnos
   public alumno: any = {};
@@ -36,7 +39,7 @@ export class RegistroAlumnos implements OnInit {
   // Variables para acotar el calendario
   public minFechaNacimiento: Date = new Date(1950, 0, 1);
   public maxFechaNacimiento: Date = new Date();
-  
+
   constructor() { }
 
   ngOnInit(): void {
@@ -83,7 +86,37 @@ export class RegistroAlumnos implements OnInit {
       return;
 
     }
+
+    // Validar que las contraseñas coincidan
+    if (this.alumno.password !== this.alumno.confirmar_password) {
+      this.errors['confirmar_password'] = 'Las contraseñas no coinciden';
+      this.notificationService.error('Las contraseñas no coinciden');
+      this.alumno.password = '';
+      this.alumno.confirmar_password = '';
+      return;
+    }
+
+    // Preparar datos con la fecha en formato YYYY-MM-DD para Django
+    const datosEnviar = {
+      ...this.alumno,
+      rol: 'alumno',
+      fecha_nacimiento: this.alumno.fecha_nacimiento instanceof Date
+        ? this.alumno.fecha_nacimiento.toISOString().split('T')[0]
+        : this.alumno.fecha_nacimiento,
+    };
+
     //Lógica para registrar o actualizar los datos del alumno
+    this.alumnosService.registrarAlumno(datosEnviar).subscribe(
+      (response) => {
+        console.log('Respuesta del backend:', response);
+        this.notificationService.success('Alumno registrado correctamente');
+        this.regresar();
+      },
+      (error) => {
+        console.error('Error al registrar el alumno:', error);
+        this.notificationService.error('Error al registrar el alumno');
+      }
+    );
   }
 
   //Método para actualizar

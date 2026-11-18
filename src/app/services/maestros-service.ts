@@ -4,6 +4,8 @@ import { AuthService } from './auth-service';
 import { ErrorsService } from './tools/errors-service';
 import { ValidatorService } from './tools/validator-service';
 import { DatosMaestro } from '../interfaces/usuarios.interfaces';
+import { environment } from '../../environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -79,8 +81,6 @@ export class MaestrosService {
 
       if (!this.validatorService.required(data['confirmar_password'])) {
         error['confirmar_password'] = this.errorService.required;
-      } else if (data['password'] !== data['confirmar_password']) {
-        error['confirmar_password'] = 'Las contraseñas no coinciden';
       }
     }
 
@@ -143,5 +143,12 @@ export class MaestrosService {
 
     // errores encontrados
     return error;
+  }
+
+  //Método para registrar un nuevo maestro en la base de datos
+  //Creamos la función con la endpoint de la API y el método POST para enviar los datos del maestro al backend
+  public registrarMaestro(data: DatosMaestro): Observable<any> {
+    //Llamada a la endpoint de la API directamente en el return para registrar un nuevo maestro
+    return this.http.post<any>(`${environment.url_api}/maestros/`, data, { headers: this.getAuthHeaders() });
   }
 }

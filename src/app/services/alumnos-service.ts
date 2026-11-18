@@ -3,7 +3,9 @@ import { inject, Injectable } from '@angular/core';
 import { AuthService } from './auth-service';
 import { ErrorsService } from './tools/errors-service';
 import { ValidatorService } from './tools/validator-service';
-import { DatosAlumno } from '../interfaces/usuarios.interfaces';
+import { DatosAlumno, DatosMaestro } from '../interfaces/usuarios.interfaces';
+import { environment } from '../../environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -70,8 +72,7 @@ export class AlumnosService {
       error['email'] = this.errorService.email;
     }
 
-    // Validación de contraseña y confirmación de contraseña solo si no se está editando el alumno
-
+    // Contraseñas (requeridas; la coincidencia se valida en el componente para mostrar el snackbar)
     if (!editar) {
       if (!this.validatorService.required(data['password'])) {
         error['password'] = this.errorService.required;
@@ -79,8 +80,6 @@ export class AlumnosService {
 
       if (!this.validatorService.required(data['confirmar_password'])) {
         error['confirmar_password'] = this.errorService.required;
-      } else if (data['password'] !== data['confirmar_password']) {
-        error['confirmar_password'] = 'Las contraseñas no coinciden';
       }
     }
 
@@ -151,5 +150,12 @@ export class AlumnosService {
 
     // Return JSON con los errores encontrados, si no hay errores el JSON estará vacío
     return error;
+  }
+
+  //Método para registrar un nuevo alumno en la base de datos
+  //Creamos la función con la endpoint de la API y el método POST para enviar los datos del alumno al backend
+  public registrarAlumno(data: DatosAlumno): Observable<any> {
+    //Llamada a la endpoint de la API directamente en el return para registrar un nuevo alumno
+    return this.http.post<any>(`${environment.url_api}/alumnos/`, data, { headers: this.getAuthHeaders() });
   }
 }
