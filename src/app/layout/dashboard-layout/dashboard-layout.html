@@ -1,5 +1,7 @@
 <div class="dashboard-layout">
-  <app-navbar-user></app-navbar-user>
+  <!-- El layout conecta el botón móvil del navbar con el sidebar. -->
+  <app-navbar-user (sidebarToggle)="sidebar.toggleSidebar()"></app-navbar-user>
+  <app-sidebar #sidebar></app-sidebar>
   <div class="dashboard-body">
     <div class="dashboard-content">
       <router-outlet></router-outlet>

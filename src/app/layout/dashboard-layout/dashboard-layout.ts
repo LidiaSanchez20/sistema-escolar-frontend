@@ -1,12 +1,15 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { NavbarUser } from '../../partials/navbar-user/navbar-user';
+import { SidebarComponent } from '../../partials/sidebar/sidebar';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard-layout',
   imports: [
-    RouterOutlet,
-    NavbarUser],
+    NavbarUser,
+    SidebarComponent,
+    RouterOutlet
+  ],
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.scss',
 })

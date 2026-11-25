@@ -22,11 +22,7 @@ export class LoginScreen implements OnInit {
 
   //Definir el router para la navegación entre pantallas
   private router: Router = inject(Router);
-
-  //Definir el servicio de autenticación para validar el login
   private authService = inject(AuthService);
-
-  //Definir el servicio de notificaciones para mostrar mensajes al usuario
   private notificationService = inject(NotificationService);
 
   constructor() {}
@@ -34,33 +30,33 @@ export class LoginScreen implements OnInit {
   ngOnInit(): void {}
 
   public login() {
-    //validar los campos de usuario y contraseña
+    //Validar los campos de usuario y contraseña
     this.errors = {};
 
     this.errors = this.authService.validarLogin(this.username, this.password);
 
-    //Verificamos si errors está vacío, si es así, procedemos a enviar la solicitud de login
-    if (Object.keys(this.errors).length > 0) {
+    //Verificamos si errors está vacío, si es así, procedemos a enviar la solicitud de login al servidor
+    if(Object.keys(this.errors).length > 0){
       return;
     }
 
-    // En caso de que no haya errores, se procede a enviar la solicitud de login al servidor
+    //En caso de que no haya errores, se procede a enviar la solicitud de login al servidor
     this.load = true;
 
-    //Llamar al servicio de login
-    // Subscribe: this.NombreServicio.función a la que se accederá, puede tener o no parámetros la función. subscribe() {}
+    // Llamar al servicio de login
     this.authService.login(this.username, this.password).subscribe(
       (response) => {
-        //Si la respuesta es exitosa, se guarda el token de sesión y los datos del usuario en las cookies
+        // Si la respuesta es exitosa, se guardan los datos del usuario en cookies y se redirige a la página principal
         this.authService.saveUserData(response);
+        console.log('Login exitoso. Datos del usuario guardados en cookies.');
         this.router.navigate(['home']);
 
         this.load = false;
       }, (error) => {
-        //Si la respuesta es un error, se muestra un mensaje de error al usuario
-        this.load = false;
-        this.notificationService.error('Error en el login: ' + error.message);
-        this.errors.general = "Credenciales inválidas. Por favor, inténtelo de nuevo."
+         this.load = false;
+        // Mostrar mensaje de error
+        this.notificationService.error("Error en el login: " + error.message);
+        this.errors.general = "Credenciales inválidas. Por favor, inténtalo de nuevo.";
       }
     );
   }
