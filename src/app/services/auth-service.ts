@@ -5,6 +5,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { ErrorsService } from './tools/errors-service';
 import { ValidatorService } from './tools/validator-service';
 import { environment } from '../../environments/environment';
+import { Observable } from 'rxjs';
 
 //Estas son variables para las cookies
 const session_cookie_name = 'sistema-escolar-token';
@@ -24,7 +25,49 @@ export class AuthService {
   private validatorService = inject(ValidatorService);
   private errorService =  inject(ErrorsService);
 
+  // Función para validar el usuario y la contraseña
+  public validarLogin (username: string, password: string) {
+    const data = {
+      "username": username,
+      "password": password
+    };
+    const error: any = {};
+
+    if (!this.validatorService.required(data['username'])) {
+      error['username'] = this.errorService.required;
+    } else if (!this.validatorService.max(data['username'], 40)) {
+      error['username'] = this.errorService.max(40);
+    }else if (!this.validatorService.email(data['username'])) {
+      error['username'] = this.errorService.email;
+    }
+
+    if (!this.validatorService.required(data['password'])) {
+      error['password'] = this.errorService.required;
+    }
+
+    return error;
+  }
+
+  //Definir la función para enviar la solicitud de login al servidor y manejar la respuesta
+  public login(username: string, password: string) {
+    const data = {
+      "username": username,
+      "password": password
+    };
+    const jsonHeaders = {headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
+
+    return this.http.post<any>(`${environment.url_api}/login/`, data, jsonHeaders);
+  }
+
+  //Función para cerrar la sesión
+  public logout(): Observable<any> {
+    const token = this.getSessionToken();
+    const headers = new HttpHeaders({'Content-Type': 'application/json', 'Authorization': 'Bearer '+token});
+    return this.http.get<any>(`${environment.url_api}/logout/`, { headers });
+  }
+
   // Funciones para manejar las cookies de sesión y autenticación del usuario
+
 
   // Esta funcion es para verificar si el usuario está autenticado
   public retrieveSignedUser(){
@@ -89,5 +132,39 @@ export class AuthService {
   // Funcion para obtener el rol del usuario
   public getUserRole(){
     return this.cookieService.get(role_name_cookie_name);
+  }
+
+  // ---- Role helpers (fuente única de verdad para toda la app) ----
+
+  isAdmin(): boolean {
+    return this.getUserRole() === 'administrador';
+  }
+
+  isTeacher(): boolean {
+    return this.getUserRole() === 'maestro';
+  }
+
+  isStudent(): boolean {
+    return this.getUserRole() === 'alumno';
+  }
+
+  canSeeAdminItems(): boolean {
+    return this.isAdmin();
+  }
+
+  canSeeTeacherItems(): boolean {
+    return this.isAdmin() || this.isTeacher();
+  }
+
+  canSeeStudentItems(): boolean {
+    return this.isAdmin() || this.isTeacher() || this.isStudent();
+  }
+
+  canSeeHomeItem(): boolean {
+    return this.isAdmin() || this.isTeacher();
+  }
+
+  canSeeRegisterItem(): boolean {
+    return this.isAdmin() || this.isTeacher();
   }
 }

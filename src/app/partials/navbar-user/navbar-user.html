@@ -1,0 +1,24 @@
+<nav class="scoop-navbar">
+  @if (isMobileView) {
+    <button class="dashboard-toggle-btn" (click)="requestSidebarToggle()" aria-label="Abrir menú">
+      <mat-icon>menu_open</mat-icon>
+    </button>
+  }
+
+  <span class="scoop-navbar-logo">BUAP</span>
+
+  <div class="scoop-navbar-icons">
+    <button
+      type="button"
+      class="navbar-icon-button"
+      (click)="togglePalette()"
+      aria-label="Cambiar tema"
+    >
+      <mat-icon>palette</mat-icon>
+    </button>
+
+    <div class="scoop-navbar-avatar" [attr.aria-label]="'Usuario ' + userInitial">
+      {{ userInitial }}
+    </div>
+  </div>
+</nav>
