@@ -1,0 +1,28 @@
+/* Saludo y rol del usuario: se muestra en el Home y en las pantallas de listados */
+.page-header {
+  margin: 3rem 0;
+}
+
+.title-perfil {
+  display: block;
+  font-family: Nexa-Bold;
+  font-size: clamp(1.375rem, 1.1rem + 1.2vw, 2.25rem);
+  line-height: 1.15;
+  color: var(--text-main, #231F20);
+  text-align: center;
+  text-transform: capitalize;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* Separa el rol del saludo sin necesidad de <br> */
+.title-perfil + .title-perfil {
+  margin-top: 0.25rem;
+  font-size: clamp(1.25rem, 1rem + 1.1vw, 1.875rem);
+}
+
+@media (min-width: 576px) {
+  .title-perfil {
+    text-align: left;
+  }
+}

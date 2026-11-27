@@ -118,7 +118,7 @@
           placeholder="Escribe RFC"
           style="text-transform: uppercase"
         />
-        <mat-hint align="end">{{ admin.rfc?.length || 0 }}/13</mat-hint>
+        <mat-hint align="end">{{ admin.rfc.length || 0 }}/13</mat-hint>
       </mat-form-field>
       @if (errors.rfc) {
         <div class="invalid-feedback">{{ errors.rfc }}</div>

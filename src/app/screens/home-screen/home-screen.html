@@ -1,1 +1,18 @@
-<p>home-screen works!</p>
+<div class="wrapper">
+  <app-page-header [nombre]="name_user" [rol]="rol"></app-page-header>
+
+  <!-- Accesos rápidos según el rol del usuario -->
+  <section class="accesos-grid" aria-label="Accesos rápidos">
+    @for (acceso of accesos; track acceso.ruta) {
+      <a class="acceso-link" [routerLink]="acceso.ruta">
+        <mat-card class="acceso-card">
+          <mat-card-content>
+            <mat-icon class="acceso-icono">{{ acceso.icono }}</mat-icon>
+            <h2 class="acceso-titulo">{{ acceso.titulo }}</h2>
+            <p class="acceso-descripcion">{{ acceso.descripcion }}</p>
+          </mat-card-content>
+        </mat-card>
+      </a>
+    }
+  </section>
+</div>

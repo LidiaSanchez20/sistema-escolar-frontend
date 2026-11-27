@@ -1,0 +1,90 @@
+<div class="wrapper">
+  <app-page-header [nombre]="name_user" [rol]="rol"></app-page-header>
+  <!-- Comienza el contenido de administrador -->
+  <div class="container">
+    <!-- Título de la tabla de administradores -->
+    <div class="row mt-3 mb-5 text-center">
+      <div class="col-12">
+        <div class="alert alert-primary" role="alert">
+          <span class="title-table">Lista de administradores registrados</span>
+        </div>
+      </div>
+    </div>
+    <!-- Tabla de administradores -->
+    @if (cargando) {
+      <!-- Mientras se obtienen los datos del backend -->
+      <div class="alert alert-info" role="status">Cargando administradores...</div>
+    } @else if (dataSource.data.length > 0) {
+      <!-- Si la tabla contiene registros se muestran todos los datos -->
+      <div class="table-scroll-wrapper">
+        <div class="mat-elevation-z8">
+          <table mat-table [dataSource]="dataSource">
+            <ng-container matColumnDef="clave_admin">
+              <th mat-header-cell *matHeaderCellDef>Clave Admin</th>
+              <td mat-cell *matCellDef="let element">{{ element.clave_admin }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="nombre">
+              <th mat-header-cell *matHeaderCellDef>Nombre Completo</th>
+              <td mat-cell *matCellDef="let element">{{ element.user.first_name }} {{ element.user.last_name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef>Email</th>
+              <td mat-cell *matCellDef="let element">{{ element.user.email }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="rfc">
+              <th mat-header-cell *matHeaderCellDef>RFC</th>
+              <td mat-cell *matCellDef="let element">{{ element.rfc }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="ocupacion">
+              <th mat-header-cell *matHeaderCellDef>Ocupación</th>
+              <td mat-cell *matCellDef="let element">{{ element.ocupacion }}</td>
+            </ng-container>
+
+            <!-- Acciones: se usan botones para que sean accesibles con teclado -->
+            <ng-container matColumnDef="editar">
+              <th mat-header-cell *matHeaderCellDef class="text-center">Editar</th>
+              <td mat-cell *matCellDef="let element" class="td-editar">
+                <button type="button" class="btn btn-link p-0" aria-label="Editar administrador"
+                  (click)="goEditar(element.id)">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="eliminar">
+              <th mat-header-cell *matHeaderCellDef class="text-center">Eliminar</th>
+              <td mat-cell *matCellDef="let element" class="td-eliminar">
+                <button type="button" class="btn btn-link p-0" aria-label="Eliminar administrador"
+                  (click)="delete(element.id)">
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+
+        <mat-paginator
+          [pageSizeOptions]="[5, 10, 20]"
+          showFirstLastButtons
+          aria-label="Seleccionar página de administradores">
+        </mat-paginator>
+      </div>
+    } @else {
+      <!-- Esto se muestra cuando no hay datos -->
+      <div class="row">
+        <div class="col-12">
+          <div class="alert alert-warning" role="alert">
+            No hay administradores registrados.
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

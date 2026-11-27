@@ -1,0 +1,8 @@
+/* Los estilos de la tabla son los mismos que en maestros-screen */
+@use '../../shared/styles/listado';
+
+/* La tabla de alumnos tiene más columnas y necesita más ancho antes de hacer scroll */
+table {
+  min-width: 1100px;
+}
+

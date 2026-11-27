@@ -1,9 +1,8 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { AuthService } from './auth-service';
-import { ErrorsService } from './tools/errors-service';
 import { ValidatorService } from './tools/validator-service';
-import { DatosMaestro } from '../interfaces/usuarios.interfaces';
+import { ErrorsService } from './tools/errors-service';
+import { ErroresFormulario, MaestroApi, RegistroMaestro } from '../interfaces/usuarios.interfaces';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 
@@ -13,40 +12,32 @@ import { Observable } from 'rxjs';
 export class MaestrosService {
   // Inyectar los servicios para validaciones y errores
   private http = inject(HttpClient);
-  private authService = inject(AuthService);
   private validatorService = inject(ValidatorService);
   private errorService = inject(ErrorsService);
 
-  // Método para los headers de autenticación
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.authService.getSessionToken();
-    return token
-      ? new HttpHeaders({ 'Content-Type': 'application/json', Authorization: `Bearer ${token}` })
-      : new HttpHeaders({ 'Content-Type': 'application/json' });
-  }
 
   // Método para definir el esquema inicial para los datos del maestro
-  public esquemaMaestro(): DatosMaestro {
+  public esquemaMaestro(): RegistroMaestro {
     return {
-      id: 0,
-      id_trabajador: 0,
+      rol: '',
+      id_trabajador: '',
       first_name: '',
       last_name: '',
       email: '',
       password: '',
       confirmar_password: '',
-      fecha_nacimiento: '',
+      fecha_nacimiento: null,
       telefono: '',
       rfc: '',
       cubiculo: '',
       area_investigacion: '',
-      materias: [],
+      materias: []
     };
   }
 
-  public validarMaestro(data: DatosMaestro, editar: boolean) {
+  public validarMaestro(data: RegistroMaestro, editar: boolean): ErroresFormulario {
     // Lógica de validación para los datos del maestro
-    const error: any = {};
+    const error: ErroresFormulario = {};
 
     // ID de trabajador
     if (!this.validatorService.required(data['id_trabajador'])) {
@@ -88,7 +79,7 @@ export class MaestrosService {
     if (!this.validatorService.required(data['fecha_nacimiento'])) {
       error['fecha_nacimiento'] = this.errorService.required;
     } else {
-      const fechaNac = new Date(data['fecha_nacimiento']);
+      const fechaNac = new Date(data['fecha_nacimiento']!);
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
 
@@ -137,18 +128,22 @@ export class MaestrosService {
     }
 
     // Materias seleccionadas
-    if (!data.materias || data.materias.length === 0) {
-      error['materias'] = 'Debes seleccionar al menos una materia';
+    if(!Array.isArray(data["materias"]) || data["materias"].length === 0){
+      error["materias_array"] = "Debes seleccionar materias para poder registrarte";
     }
 
     // errores encontrados
     return error;
   }
 
-  //Método para registrar un nuevo maestro en la base de datos
-  //Creamos la función con la endpoint de la API y el método POST para enviar los datos del maestro al backend
-  public registrarMaestro(data: DatosMaestro): Observable<any> {
-    //Llamada a la endpoint de la API directamente en el return para registrar un nuevo maestro
-    return this.http.post<any>(`${environment.url_api}/maestros/`, data, { headers: this.getAuthHeaders() });
+  // El backend recibe la fecha de nacimiento como texto (YYYY-MM-DD) y no como Date
+  public registrarMaestro(data: Omit<RegistroMaestro, 'fecha_nacimiento'> & { fecha_nacimiento: string }): Observable<unknown> {
+    return this.http.post<unknown>(`${environment.url_api}/maestros/`, data);
+  }
+
+  // Método para obtener la lista de maestros desde la base de datos
+  public obtenerListaMaestros(): Observable<MaestroApi[]> {
+    // Llamada al endpoint de la API directamente en el return para obtener la lista de maestros
+    return this.http.get<MaestroApi[]>(`${environment.url_api}/lista-maestros/`);
   }
 }

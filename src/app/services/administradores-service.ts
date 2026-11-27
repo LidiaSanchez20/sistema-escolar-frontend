@@ -1,9 +1,8 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { AuthService } from './auth-service';
 import { ErrorsService } from './tools/errors-service';
 import { ValidatorService } from './tools/validator-service';
-import { DatosAdministrador } from '../interfaces/usuarios.interfaces';
+import { AdministradorApi, DatosAdministrador, ErroresFormulario } from '../interfaces/usuarios.interfaces';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -13,17 +12,8 @@ import { environment } from '../../environments/environment';
 export class AdministradoresService {
   //Inyectar los servicios para validaciones y errores
   private http = inject(HttpClient);
-  private authService = inject(AuthService);
   private validatorService = inject(ValidatorService);
   private errorService = inject(ErrorsService);
-
-  // Método para los headers de autenticación que sirven para enviar el token de sesión en las solicitudes HTTP
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.authService.getSessionToken();
-    return token
-      ? new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` })
-      : new HttpHeaders({ 'Content-Type': 'application/json' });
-  }
 
   //Método para definir el esquema de validación para los datos del administrador
   public esquemaAdmin(): DatosAdministrador {
@@ -109,9 +99,14 @@ export class AdministradoresService {
   //Método para registrar un nuevo administrador en la base de datos
   //Creamos la función con la endpoint de la API y el método POST para enviar los datos del administrador al backend
   public registrarAdmin(data: DatosAdministrador): Observable<any> {
-    //Llamada a la endpoint de la API directamente en el return para registrar un nuevo administrador
-    return this.http.post<any>(`${environment.url_api}/admin/`, data, { headers: this.getAuthHeaders() });
+    // Llamada al endpoint de la API directamente en el return para registrar un nuevo administrador
+    return this.http.post<unknown>(`${environment.url_api}/admin/`, data);
   }
 
+  // Método para obtener la lista de administradores desde la base de datos
+  public obtenerListaAdmins(): Observable<AdministradorApi[]> {
+    // Llamada al endpoint de la API directamente en el return para obtener la lista de administradores
+    return this.http.get<AdministradorApi[]>(`${environment.url_api}/lista-admins/`);
+  }
 
 }

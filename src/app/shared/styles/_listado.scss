@@ -1,0 +1,150 @@
+/* =========================
+   _listado.scss
+   Estilos compartidos por las pantallas que muestran una tabla
+   (administradores y maestros). Cada pantalla lo incluye con:
+   @use '../../shared/styles/listado';
+   ========================= */
+
+$color-texto: #231F20;
+/* Texto que respeta el tema claro/oscuro del navbar */
+$color-texto-tema: var(--text-main, #{$color-texto});
+$color-editar: #0092B8;
+$color-editar-hover: #006179;
+$color-eliminar: #E84150;
+$color-eliminar-hover: #ce1626;
+$sombra-card: 0 4px 24px rgba(0, 0, 0, 0.07);
+
+/* El margen del sidebar ya lo aplica .dashboard-content en el layout */
+.wrapper {
+  height: auto;
+}
+
+/* Alineación con el saludo: sin gutters de Bootstrap ni contenedor centrado */
+.row {
+  --bs-gutter-x: 0;
+}
+
+.container {
+  max-width: 100%;
+  padding: 0;
+}
+
+/* =========================
+   Título de la tabla
+   ========================= */
+.title-table {
+  display: block;
+  padding: 0 8px;
+  font-family: Nexa-Bold;
+  font-size: clamp(1.125rem, 0.95rem + 0.9vw, 1.875rem);
+  line-height: 1.15;
+  color: $color-texto-tema;
+  text-align: center;
+  text-transform: capitalize;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 576px) {
+  .title-table {
+    padding: 0;
+    text-align: left;
+  }
+}
+
+/* =========================
+   Tabla (Angular Material)
+   ========================= */
+.table-scroll-wrapper {
+  width: 100%;
+  background: var(--table-bg, #fff);
+  border-radius: 12px;
+  box-shadow: $sombra-card;
+  overflow: hidden;
+}
+
+/* Solo la tabla hace scroll horizontal; el paginador permanece visible */
+.mat-elevation-z8 {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  box-shadow: none;
+}
+
+table {
+  /* Evita que las columnas se aplasten: en pantallas chicas se hace scroll horizontal */
+  min-width: 700px;
+  width: 100%;
+}
+
+.mat-mdc-header-cell {
+  font-family: Nexa-Bold !important;
+  font-size: 1rem;
+  text-align: left;
+  color: $color-texto-tema !important;
+  border-bottom-color: var(--table-header-border, #{$color-texto});
+}
+
+.mat-mdc-cell {
+  font-family: Nexa !important;
+  font-size: 0.875rem !important;
+  text-align: left;
+  color: $color-texto-tema !important;
+}
+
+@media (min-width: 576px) {
+  .mat-mdc-header-cell {
+    font-size: 1.125rem;
+  }
+
+  .mat-mdc-cell {
+    font-size: 0.95rem !important;
+  }
+}
+
+/* =========================
+   Acciones (editar / eliminar)
+   ========================= */
+.td-editar {
+  --accion: #{$color-editar};
+  --accion-hover: #{$color-editar-hover};
+}
+
+.td-eliminar {
+  --accion: #{$color-eliminar};
+  --accion-hover: #{$color-eliminar-hover};
+}
+
+.td-editar,
+.td-eliminar {
+  text-align: center;
+
+  button {
+    font-size: 1.25rem;
+    line-height: 1;
+    color: var(--accion);
+    transition: color 0.15s, transform 0.15s;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--accion-hover);
+      /* transform en lugar de font-size para no mover el resto de la fila */
+      transform: scale(1.2);
+    }
+  }
+}
+
+/* =========================
+   Alertas
+   ========================= */
+.alert-warning {
+  width: 100%;
+  margin-bottom: 2rem;
+  padding: 1rem 1.5rem;
+  font-family: Nexa;
+  font-size: 1rem;
+  color: $color-texto;
+  text-align: center;
+  background: #FFF3CD;
+  border-radius: 12px;
+  box-shadow: $sombra-card;
+}

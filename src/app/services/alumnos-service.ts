@@ -1,11 +1,11 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { AuthService } from './auth-service';
 import { ErrorsService } from './tools/errors-service';
 import { ValidatorService } from './tools/validator-service';
-import { DatosAlumno, DatosMaestro } from '../interfaces/usuarios.interfaces';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
+import { AlumnoApi, ErroresFormulario, RegistroAlumno } from '../interfaces/usuarios.interfaces';
+
 
 @Injectable({
   providedIn: 'root',
@@ -13,40 +13,31 @@ import { Observable } from 'rxjs';
 export class AlumnosService {
   // Inyectar los servicios para validaciones y errores
   private http = inject(HttpClient);
-  private authService = inject(AuthService);
   private validatorService = inject(ValidatorService);
   private errorService = inject(ErrorsService);
 
-  // Método para los headers de autenticación que sirven para enviar el token de sesión en las solicitudes HTTP
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.authService.getSessionToken();
-    return token
-      ? new HttpHeaders({ 'Content-Type': 'application/json', Authorization: `Bearer ${token}` })
-      : new HttpHeaders({ 'Content-Type': 'application/json' });
-  }
-
   // Método para definir el esquema de validación para los datos del alumno
-  public esquemaAlumno(): DatosAlumno {
+  public esquemaAlumno(): RegistroAlumno {
     return {
-      id: 0,
-      matricula: 0,
+      rol: '',
+      matricula: '',
       first_name: '',
       last_name: '',
       email: '',
       password: '',
       confirmar_password: '',
-      fecha_nacimiento: '',
+      fecha_nacimiento: null,
       curp: '',
       rfc: '',
-      edad: 0,
+      edad: null,
       telefono: '',
       ocupacion: ''
     };
   }
 
-  public validarAlumno(data: DatosAlumno, editar: boolean) {
+  public validarAlumno(data: RegistroAlumno, editar: boolean): ErroresFormulario {
     // Lógica de validación para los datos del alumno
-    const error: any = {};
+    const error: ErroresFormulario = {};
 
     // Validaciones
     if (!this.validatorService.required(data['matricula'])) {
@@ -80,6 +71,8 @@ export class AlumnosService {
 
       if (!this.validatorService.required(data['confirmar_password'])) {
         error['confirmar_password'] = this.errorService.required;
+      } else if (data['password'] !== data['confirmar_password']) {
+        error['confirmar_password'] = 'Las contraseñas no coinciden';
       }
     }
 
@@ -87,7 +80,7 @@ export class AlumnosService {
     if (!this.validatorService.required(data['fecha_nacimiento'])) {
       error['fecha_nacimiento'] = this.errorService.required;
     } else {
-      const fechaNac = new Date(data['fecha_nacimiento']);
+      const fechaNac = new Date(data['fecha_nacimiento']!);
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
 
@@ -128,7 +121,7 @@ export class AlumnosService {
       error['edad'] = this.errorService.required;
     } else if (!this.validatorService.numeric(data['edad'])) {
       error['edad'] = 'El formato es solo números';
-    } else if (data['edad'] < 18) {
+    } else if (Number(data['edad']) < 18) {
       error['edad'] = 'La edad debe ser mayor o igual a 18';
     }
 
@@ -152,10 +145,13 @@ export class AlumnosService {
     return error;
   }
 
-  //Método para registrar un nuevo alumno en la base de datos
-  //Creamos la función con la endpoint de la API y el método POST para enviar los datos del alumno al backend
-  public registrarAlumno(data: DatosAlumno): Observable<any> {
-    //Llamada a la endpoint de la API directamente en el return para registrar un nuevo alumno
-    return this.http.post<any>(`${environment.url_api}/alumnos/`, data, { headers: this.getAuthHeaders() });
+  // El backend recibe la fecha de nacimiento como texto (YYYY-MM-DD) y no como Date
+  public registrarAlumno(data: Omit<RegistroAlumno, 'fecha_nacimiento'> & { fecha_nacimiento: string }): Observable<unknown> {
+    return this.http.post<unknown>(`${environment.url_api}/alumnos/`, data);
+  }
+
+  // Método para obtener la lista de alumnos desde la base de datos
+  public obtenerListaAlumnos(): Observable<AlumnoApi[]> {
+    return this.http.get<AlumnoApi[]>(`${environment.url_api}/lista-alumnos/`);
   }
 }

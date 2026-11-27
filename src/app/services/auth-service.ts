@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
@@ -6,6 +6,7 @@ import { ErrorsService } from './tools/errors-service';
 import { ValidatorService } from './tools/validator-service';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
+import { ErroresFormulario, RespuestaLogin } from '../interfaces/usuarios.interfaces';
 
 //Estas son variables para las cookies
 const session_cookie_name = 'sistema-escolar-token';
@@ -25,56 +26,46 @@ export class AuthService {
   private validatorService = inject(ValidatorService);
   private errorService =  inject(ErrorsService);
 
-  // Función para validar el usuario y la contraseña
-  public validarLogin (username: string, password: string) {
-    const data = {
-      "username": username,
-      "password": password
-    };
-    const error: any = {};
+  //Función para validar el usuario y la contraseña, y si son correctos, guardar los datos del usuario en cookies y redirigir a la página principal
+  public validarLogin(username: string, password: string): ErroresFormulario {
+     const data = {
+       "username": username,
+       "password": password
+     };
+     const error: ErroresFormulario = {};
 
-    if (!this.validatorService.required(data['username'])) {
-      error['username'] = this.errorService.required;
-    } else if (!this.validatorService.max(data['username'], 40)) {
-      error['username'] = this.errorService.max(40);
-    }else if (!this.validatorService.email(data['username'])) {
-      error['username'] = this.errorService.email;
-    }
+     if(!this.validatorService.required(data["username"])){
+       error["username"] = this.errorService.required;
+     }else if(!this.validatorService.max(data["username"], 40)){
+       error["username"] = this.errorService.max(40);
+     }else if (!this.validatorService.email(data['username'])) {
+       error['username'] = this.errorService.email;
+     }
 
-    if (!this.validatorService.required(data['password'])) {
-      error['password'] = this.errorService.required;
-    }
+     if(!this.validatorService.required(data["password"])){
+       error["password"] = this.errorService.required;
+     }
 
-    return error;
+     return error;
+
   }
 
   //Definir la función para enviar la solicitud de login al servidor y manejar la respuesta
-  public login(username: string, password: string) {
+  public login(username: string, password: string): Observable<RespuestaLogin> {
     const data = {
       "username": username,
       "password": password
     };
-    const jsonHeaders = {headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
-    return this.http.post<any>(`${environment.url_api}/login/`, data, jsonHeaders);
+    return this.http.post<RespuestaLogin>(`${environment.url_api}/login/`, data);
   }
 
-  //Función para cerrar la sesión
-  public logout(): Observable<any> {
-    const token = this.getSessionToken();
-    const headers = new HttpHeaders({'Content-Type': 'application/json', 'Authorization': 'Bearer '+token});
-    return this.http.get<any>(`${environment.url_api}/logout/`, { headers });
+  //Cerrar sesión
+  public logout(): Observable<unknown> {
+    return this.http.get(`${environment.url_api}/logout/`);
   }
 
   // Funciones para manejar las cookies de sesión y autenticación del usuario
-
-
-  // Esta funcion es para verificar si el usuario está autenticado
-  public retrieveSignedUser(){
-    const token = this.getSessionToken();
-    const headers = new HttpHeaders({'Authorization': 'Bearer '+token});
-    return this.http.get<any>(`${environment.url_api}/me/`, { headers });
-  }
 
   // Esta funcion es para obtener el valor de una cookie por su clave
   public getCookieValue(key:string){
@@ -94,11 +85,11 @@ export class AuthService {
 
   // Función para guardar los datos del usuario en cookies, incluyendo su id, email, nombre completo, token de sesión y rol.
   // Se verifica si la respuesta del servidor es plana o anidada en 'user' y se establecen las opciones de seguridad según el protocolo (HTTP o HTTPS).
-  public saveUserData(user_data: any) {
+  public saveUserData(user_data: RespuestaLogin) {
     const secure = environment.url_api.indexOf("https") !== -1;
     // Soporta respuesta plana o anidada en 'user'
-    const id = user_data.id || user_data.user?.id;
-    const email = user_data.email || user_data.user?.email;
+    const id = String(user_data.id ?? user_data.user?.id ?? '');
+    const email = user_data.email || user_data.user?.email || '';
     const first_name = user_data.first_name || user_data.user?.first_name || '';
     const last_name = user_data.last_name || user_data.user?.last_name || '';
     const name = (first_name + " " + last_name).trim();
@@ -161,10 +152,11 @@ export class AuthService {
   }
 
   canSeeHomeItem(): boolean {
-    return this.isAdmin() || this.isTeacher();
+    return this.isAdmin() || this.isTeacher() || this.isStudent();
   }
 
   canSeeRegisterItem(): boolean {
     return this.isAdmin() || this.isTeacher();
   }
+
 }

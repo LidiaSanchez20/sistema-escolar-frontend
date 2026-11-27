@@ -44,6 +44,7 @@
             <span>Maestros</span>
           </a>
         </li>
+        <!-- Pendiente: Materias y Eventos Académicos se habilitarán cuando existan sus rutas
         <li>
           <a routerLink="/materias" routerLinkActive="active" (click)="closeSidebar()">
             <mat-icon>library_books</mat-icon>
@@ -56,6 +57,7 @@
             <span>Eventos Académicos</span>
           </a>
         </li>
+        -->
       }
 
       @if (canSeeStudentItems()) {
@@ -65,12 +67,14 @@
             <span>Alumnos</span>
           </a>
         </li>
+        <!-- Pendiente: Gráficas se habilitará cuando exista su ruta
         <li>
           <a routerLink="/graficas" routerLinkActive="active" (click)="closeSidebar()">
             <mat-icon>bar_chart</mat-icon>
             <span>Gráficas</span>
           </a>
         </li>
+        -->
       }
     </ul>
 

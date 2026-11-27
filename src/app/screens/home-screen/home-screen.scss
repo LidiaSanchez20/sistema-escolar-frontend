@@ -1,0 +1,49 @@
+/* Cuadrícula de accesos rápidos del Home */
+.accesos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+  padding: 0;
+}
+
+.acceso-link {
+  display: block;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: none;
+  }
+}
+
+.acceso-card {
+  height: 100%;
+  padding: 1rem;
+  background: var(--table-bg, #fff);
+  color: var(--text-main, #231F20);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.acceso-link:hover .acceso-card,
+.acceso-link:focus-visible .acceso-card {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.acceso-icono {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 0.5rem;
+  font-size: 48px;
+  color: var(--primary, #1976d2);
+}
+
+.acceso-titulo {
+  font-family: Nexa-Bold;
+  font-size: 1.25rem;
+}
+
+.acceso-descripcion {
+  font-family: Nexa;
+  font-size: 0.95rem;
+}
